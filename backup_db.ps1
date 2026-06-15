@@ -6,23 +6,23 @@
 # ==============================================================================
 
 # --- 1. KONFİGÜRASYON AYARLARI ---
-$DbHost = "127.0.0.1"
-$DbPort = "5432"
-$DbName = "kitapsatisdb"
-$DbUser = "postgres"
-$DbPassword = "1234"
+$DbHost = ""
+$DbPort = ""
+$DbName = ""
+$DbUser = ""
+$DbPassword = ""
 
 # Yedeklerin saklanacağı klasör
 $BackupDir = "C:\BookStore_Backups"
 $RetentionDays = 14
 
 # E-posta (SMTP) Ayarları
-$SmtpHost = "mail.deu.edu.tr"
-$SmtpPort = 27002
-$SmtpUser = "kitapsatis@deu.edu.tr"
-$SmtpPassword = "4T3KCI5HX"
-$SmtpFrom = "kitapsatis@deu.edu.tr"
-$SmtpTo = "kitapsatis@deu.edu.tr"
+$SmtpHost = ""
+$SmtpPort = 
+$SmtpUser = ""
+$SmtpPassword = ""
+$SmtpFrom = ""
+$SmtpTo = ""
 $UseSsl = $true
 
 # pg_dump.exe'nin yolu (Boş bırakılırsa sistem PATH değişkeninde veya standart yollarda aranır)
