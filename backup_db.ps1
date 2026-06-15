@@ -36,6 +36,7 @@ $PgDumpPath = ""
 $DateStr = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $BackupFileName = "bookstore_backup_$DateStr"
 $SqlPath = Join-Path $BackupDir "$BackupFileName.sql"
+$BackupPath = Join-Path $BackupDir "$BackupFileName.backup"
 $ZipPath = Join-Path $BackupDir "$BackupFileName.zip"
 $LogPath = Join-Path $BackupDir "backup_log.txt"
 
@@ -86,7 +87,9 @@ try {
 
     # 3. pg_dump Çalıştırma (Parola geçici çevre değişkeninden okunur)
     $env:PGPASSWORD = $DbPassword
-    $dumpArgs = @(
+    
+    # 3.1 Düz SQL Yedek Alma
+    $dumpArgsSql = @(
         "--host=$DbHost",
         "--port=$DbPort",
         "--username=$DbUser",
@@ -95,29 +98,45 @@ try {
         "--file=$SqlPath",
         $DbName
     )
-
-    Write-Log "SQL Dökümü alınıyor..."
-    $process = Start-Process -FilePath $PgDumpPath -ArgumentList $dumpArgs -NoNewWindow -PassThru -Wait
+    Write-Log "SQL Dökümü alınıyor (Plain Text SQL)..."
+    $processSql = Start-Process -FilePath $PgDumpPath -ArgumentList $dumpArgsSql -NoNewWindow -PassThru -Wait
+    
+    # 3.2 İkili pgAdmin Uyumlu Backup Alma
+    $dumpArgsBackup = @(
+        "--host=$DbHost",
+        "--port=$DbPort",
+        "--username=$DbUser",
+        "--no-password",
+        "--format=custom",
+        "--file=$BackupPath",
+        $DbName
+    )
+    Write-Log "Binary yedek dökümü alınıyor (pgAdmin Custom format)..."
+    $processBackup = Start-Process -FilePath $PgDumpPath -ArgumentList $dumpArgsBackup -NoNewWindow -PassThru -Wait
     
     # Şifreyi çevre değişkeninden hemen temizle
     $env:PGPASSWORD = $null
 
-    if ($process.ExitCode -ne 0) {
-        throw "pg_dump başarısız oldu. Çıkış Kodu: $($process.ExitCode)"
+    if ($processSql.ExitCode -ne 0 -or $processBackup.ExitCode -ne 0) {
+        throw "pg_dump başarısız oldu. SQL Çıkış Kodu: $($processSql.ExitCode), Backup Çıkış Kodu: $($processBackup.ExitCode)"
     }
 
     if (-not (Test-Path $SqlPath) -or (Get-Item $SqlPath).Length -eq 0) {
         throw "Yedek SQL dosyası oluşturulamadı veya boş."
     }
 
-    Write-Log "SQL Dökümü başarıyla alındı. Dosya boyutu: $(( (Get-Item $SqlPath).Length / 1KB ).ToString('F2')) KB"
+    if (-not (Test-Path $BackupPath) -or (Get-Item $BackupPath).Length -eq 0) {
+        throw "Yedek Backup dosyası oluşturulamadı veya boş."
+    }
 
-    # 4. Zip formatında sıkıştırma
-    Write-Log "Yedek dosyası sıkıştırılıyor..."
-    Compress-Archive -Path $SqlPath -DestinationPath $ZipPath -Force
+    Write-Log "Yedekler alındı. SQL: $(( (Get-Item $SqlPath).Length / 1KB ).ToString('F2')) KB, Backup: $(( (Get-Item $BackupPath).Length / 1KB ).ToString('F2')) KB"
+
+    # 4. Zip formatında sıkıştırma (Her iki dosyayı birden ekle)
+    Write-Log "Yedek dosyaları sıkıştırılıyor..."
+    Compress-Archive -Path $SqlPath, $BackupPath -DestinationPath $ZipPath -Force
     
-    # Ham SQL dosyasını temizle
-    Remove-Item $SqlPath -Force
+    # Ham dosyaları temizle
+    Remove-Item $SqlPath, $BackupPath -Force
 
     $ZipSizeMB = (Get-Item $ZipPath).Length / 1MB
     Write-Log "Sıkıştırma tamamlandı. ZIP boyutu: $($ZipSizeMB.ToString('F2')) MB"
