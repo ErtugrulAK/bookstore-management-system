@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # DEÜ KİTAP SATIŞ - OTOMATİK POSTGRESQL YEDEKLEME VE E-POSTA SCRIPTİ
 # ==============================================================================
 # Bu script, veritabanını pg_dump ile yedekler, zip olarak sıkıştırır,
@@ -162,11 +162,11 @@ Yedek dosyası bu e-postaya eklenmiştir.
 
     # 20 MB kontrolü (E-posta ek limiti)
     if ($ZipSizeMB -lt 20) {
-        Send-MailMessage -From $SmtpFrom -To $SmtpTo -Subject $MailSubject -Body $MailBody -SmtpServer $SmtpHost -Port $SmtpPort -Credential $Credentials -UseSsl -Attachments $ZipPath -Encoding UTF8
+        Send-MailMessage -From $SmtpFrom -To $SmtpTo -Subject $MailSubject -Body $MailBody -SmtpServer $SmtpHost -Port $SmtpPort -Credential $Credentials -UseSsl -Attachments $ZipPath -Encoding UTF8 -ErrorAction Stop
         Write-Log "Yedek dosyası ek olarak e-postaya eklendi ve gönderildi."
     } else {
         $MailBody += "`n`nUYARI: Yedek boyutu 20 MB sınırını aştığı için e-postaya eklenmemiştir. Sunucudan manuel olarak '$ZipPath' adresinden erişebilirsiniz."
-        Send-MailMessage -From $SmtpFrom -To $SmtpTo -Subject "$MailSubject (BÜYÜK BOYUT - EK DIŞI)" -Body $MailBody -SmtpServer $SmtpHost -Port $SmtpPort -Credential $Credentials -UseSsl -Encoding UTF8
+        Send-MailMessage -From $SmtpFrom -To $SmtpTo -Subject "$MailSubject (BÜYÜK BOYUT - EK DIŞI)" -Body $MailBody -SmtpServer $SmtpHost -Port $SmtpPort -Credential $Credentials -UseSsl -Encoding UTF8 -ErrorAction Stop
         Write-Log "Yedek boyutu 20 MB üzerinde olduğu için ek koyulmadan mail gönderildi."
     }
 
@@ -194,7 +194,7 @@ Tarih: $(Get-Date -Format "dd.MM.yyyy HH:mm:ss")
 
 Lütfen en kısa sürede canlı sunucuyu ve yedekleme ayarlarını kontrol ediniz.
 "@
-        Send-MailMessage -From $SmtpFrom -To $SmtpTo -Subject $MailSubject -Body $MailBody -SmtpServer $SmtpHost -Port $SmtpPort -Credential $Credentials -UseSsl -Encoding UTF8
+        Send-MailMessage -From $SmtpFrom -To $SmtpTo -Subject $MailSubject -Body $MailBody -SmtpServer $SmtpHost -Port $SmtpPort -Credential $Credentials -UseSsl -Encoding UTF8 -ErrorAction Stop
     } catch {
         Write-Log "Hata bildirim maili gönderilirken de hata oluştu: $($_.Exception.Message)" "ERROR"
     }
