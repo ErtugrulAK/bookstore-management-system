@@ -42,6 +42,7 @@ Desktop.ini
 # Build and deployment outputs
 publish/
 publish.zip
+*.zip
 BookStore.Api/wwwroot/
 
 # Temp scratch files

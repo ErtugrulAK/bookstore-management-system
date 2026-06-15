@@ -18,40 +18,45 @@ namespace BookStore.Api.Services
 
         public async Task SendCustomEmailAsync(string toEmail, string subject, string body)
         {
-            try
+            // Eğer şifre "xxxx" veya girilmemişse, SMTP işlemi iptal edilir, sadece console'a log atar.
+            if (string.IsNullOrEmpty(_emailSettings.Password) || _emailSettings.Password.Contains("xxxx") || _emailSettings.Password.Contains("SIFRENIZI_YAZIN"))
             {
-                // Eğer şifre "xxxx" veya girilmemişse, SMTP işlemi iptal edilir, sadece console'a log atar.
-                // (Geliştirme / Test amaçlı kullanım)
-                if (string.IsNullOrEmpty(_emailSettings.Password) || _emailSettings.Password.Contains("xxxx"))
+                _logger.LogWarning($"[MOCK EMAIL] To: {toEmail} | Subject: {subject} | Body: {body}");
+                return;
+            }
+
+            // Mail gönderme işlemini arka planda (Background Task) çalıştırıyoruz.
+            // Böylece SMTP sunucusundaki zaman aşımı (timeout) gecikmeleri API'yi (Sipariş/Sepet/Kayıt) kilitlemez.
+            _ = Task.Run(async () =>
+            {
+                try
                 {
-                    _logger.LogWarning($"[MOCK EMAIL] To: {toEmail} | Subject: {subject} | Body: {body}");
-                    return;
+                    using var client = new SmtpClient(_emailSettings.Host, _emailSettings.Port)
+                    {
+                        Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password),
+                        EnableSsl = _emailSettings.EnableSSL
+                    };
+
+                    using var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_emailSettings.Username, "DEÜ Kitap Satış"),
+                        Subject = subject,
+                        Body = body,
+                        IsBodyHtml = true
+                    };
+
+                    mailMessage.To.Add(toEmail);
+
+                    await client.SendMailAsync(mailMessage);
+                    _logger.LogInformation($"Email sent successfully (Background) to {toEmail} regarding {subject}");
                 }
-
-                using var client = new SmtpClient(_emailSettings.Host, _emailSettings.Port)
+                catch (Exception ex)
                 {
-                    Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password),
-                    EnableSsl = _emailSettings.EnableSSL
-                };
+                    _logger.LogError(ex, $"Background email sending failed to {toEmail}");
+                }
+            });
 
-                using var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(_emailSettings.Username, "DEÜ Kitap Satış"),
-                    Subject = subject,
-                    Body = body,
-                    IsBodyHtml = true
-                };
-
-                mailMessage.To.Add(toEmail);
-
-                await client.SendMailAsync(mailMessage);
-                _logger.LogInformation($"Email sent successfully to {toEmail} regarding {subject}");
-            }
-            catch (Exception ex)
-            {
-                // Hata tüm sistemi çökertmemesi için yakalanır (Rehberdeki mantık)
-                _logger.LogError(ex, $"Failed to send email to {toEmail}");
-            }
+            await Task.CompletedTask;
         }
 
         public async Task SendOrderShippedEmailAsync(string toEmail, string orderNumber)
