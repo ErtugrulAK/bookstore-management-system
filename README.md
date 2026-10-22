@@ -103,7 +103,7 @@ Required/overridable configuration (env vars follow the standard
   holds a placeholder). The mailbox password must be rotated by its owner —
   treat it as compromised. Erasing history (force-push) is a separate,
   destructive decision and was not taken.
-- The former committed JWT key (`SUPER_SECRET_KEY_32_CHAR_MINIMUM_123456`)
+- The former committed JWT key
   remains in history; tokens signed with it must not be trusted and any real
   deployment needs a fresh `Jwt__Key` (startup now hard-fails in Production
   without one).

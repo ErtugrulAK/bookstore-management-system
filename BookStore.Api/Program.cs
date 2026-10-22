@@ -19,7 +19,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Outside Development the app refuses to start without a real, non-placeholder
 // signing secret (set Jwt__Key env var or `dotnet user-secrets set Jwt:Key ...`).
 var jwtKey = builder.Configuration["Jwt:Key"];
-var insecurePlaceholders = new[] { "SUPER_SECRET_KEY_32_CHAR_MINIMUM_123456", "CHANGE_ME_SET_VIA_Jwt__Key" };
+var insecurePlaceholders = new[] { "CHANGE_ME_SET_VIA_Jwt__Key" };
+// Block reuse of the historically leaked signing key without re-committing its
+// literal bytes: compare SHA-256 (uppercase hex) of the configured key.
+var legacyLeakedKeyHash = "5E2D66E8252D6451ADE9214DAEC219286B46C6595F79E98B5C89F2FA5B4DA1E2";
+if (!string.IsNullOrWhiteSpace(jwtKey) &&
+    Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(jwtKey))) == legacyLeakedKeyHash)
+    throw new InvalidOperationException("Jwt:Key matches the historically leaked value; rotate it (see README).");
 if (!builder.Environment.IsDevelopment() &&
     (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32 || insecurePlaceholders.Contains(jwtKey)))
 {
