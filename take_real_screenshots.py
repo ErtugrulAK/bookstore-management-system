@@ -2,6 +2,7 @@ import subprocess
 import time
 import os
 import sys
+from pg_env import admin_ui_password
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -85,7 +86,7 @@ def main():
         print("Logging in...")
         username_input.send_keys("admin")
         password_input = driver.find_element(By.XPATH, "//input[@placeholder='Şifre']")
-        password_input.send_keys("1234")
+        password_input.send_keys(admin_ui_password())
         
         submit_btn = driver.find_element(By.XPATH, "//button[type='submit' or contains(text(), 'Giriş')]")
         submit_btn.click()

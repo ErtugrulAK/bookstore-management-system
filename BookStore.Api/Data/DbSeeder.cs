@@ -26,21 +26,42 @@ namespace BookStore.Api.Data
             }
         }
 
-        public static void SeedAdmin(AppDbContext context)
+        public static void SeedAdmin(AppDbContext context, IHostEnvironment environment)
         {
-            if (!context.Users.Any(u => u.Username == "admin"))
+            if (context.Users.Any(u => u.Username == "admin"))
+                return;
+
+            // One-time bootstrap credentials: set BOOKSTORE_ADMIN_PASSWORD (and
+            // optionally BOOKSTORE_ADMIN_EMAIL) for the first start; unset the
+            // variables afterwards and change the password in the app.
+            var bootstrapPassword = Environment.GetEnvironmentVariable("BOOKSTORE_ADMIN_PASSWORD");
+            var bootstrapEmail = Environment.GetEnvironmentVariable("BOOKSTORE_ADMIN_EMAIL") ?? "admin@bookstore.com";
+
+            if (string.IsNullOrEmpty(bootstrapPassword))
             {
-                context.Users.Add(new User
+                if (environment.IsDevelopment())
                 {
-                    Username = "admin",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("1234"),
-                    Role = "Admin",
-                    FirstName = "Sistem",
-                    LastName = "Yöneticisi",
-                    Email = "admin@bookstore.com"
-                });
-                context.SaveChanges();
+                    bootstrapPassword = "1234"; // local development default only
+                    Console.WriteLine("[Seeder] Development: created admin/1234. Never deploy this combination.");
+                }
+                else
+                {
+                    Console.WriteLine("[Seeder] Refusing to seed 'admin': BOOKSTORE_ADMIN_PASSWORD is not set. " +
+                                      "Set it once for first login, then remove the variable.");
+                    return;
+                }
             }
+
+            context.Users.Add(new User
+            {
+                Username = "admin",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(bootstrapPassword),
+                Role = "Admin",
+                FirstName = "Sistem",
+                LastName = "Yöneticisi",
+                Email = bootstrapEmail
+            });
+            context.SaveChanges();
         }
 
         public static void SyncStockStatus(AppDbContext context)

@@ -11,6 +11,15 @@ PostgreSQL backups and mails the result.
 Co-developed project (majority of commits by a teammate); documentation in
 this repo is primarily Turkish — this README is the English index.
 
+## Screenshots (from this repository, real captures)
+
+| Storefront | Admin — inventory | Admin — dashboard |
+|---|---|---|
+| ![Storefront](manual_assets/02_home.png) | ![Inventory](manual_assets/books_mockup.png) | ![Dashboard](manual_assets/dashboard_mockup.png) |
+
+More flows (checkout steps, distance-sale form, contact, reports) in
+`manual_assets/`, referenced by the admin manual below.
+
 ## Stack (verified)
 
 - **API** — ASP.NET Core 8 (`net8.0`), EF Core + Npgsql (PostgreSQL),
@@ -55,8 +64,24 @@ npm install
 npm run dev         # http://localhost:5173 (proxies /api to :5229)
 ```
 
-A fresh start creates tables and seeds `admin / 1234` plus the book catalog
-from `books_data_v2.json`.
+On first start the API migrates the schema, seeds the book catalog from
+`books_data_v2.json`, and bootstraps the admin user:
+
+- **Development:** `admin / 1234` (printed warning — never deploy this pair).
+- **Production:** seeded only when `BOOKSTORE_ADMIN_PASSWORD` (optionally
+  `BOOKSTORE_ADMIN_EMAIL`) is set; otherwise seeding is skipped. Use a one-time
+  bootstrap value, log in, change the password, then unset the variable.
+
+Required/overridable configuration (env vars follow the standard
+`Section__Key` convention, or use `dotnet user-secrets` for Development):
+
+| Variable | Purpose | Behavior if unset |
+|---|---|---|
+| `Jwt__Key` | HMAC signing secret (≥32 chars) | app refuses to start outside Development; placeholder in `appsettings.json` is rejected the same way |
+| `ConnectionStrings__DefaultConnection` | PostgreSQL connection | falls back to the local dev string in `appsettings.json` |
+| `EmailSettings__Host/Port/Username/Password` | SMTP | EmailService logs `[MOCK EMAIL]` instead of sending (placeholder detection) |
+| `Cors__AllowedOrigins__0…` | extra frontend origins | dev default `http://localhost:5173` |
+| `BOOKSTORE_ADMIN_PASSWORD` | first-run admin bootstrap | production: no admin seeded |
 
 ## API surface (controllers, all under `/api`)
 
@@ -74,32 +99,36 @@ from `books_data_v2.json`.
 ## Security notes — read before deploying anywhere
 
 - **A real SMTP account password (`kitapsatis@deu.edu.tr` @ mail.deu.edu.tr:27002)
-  was committed in history** (commit `0e9a327`, later replaced with a
-  placeholder). Rotate that mailbox password; erasing history is a separate,
-  destructive step this repo has intentionally not taken.
-- `appsettings.json` ships a placeholder JWT signing key
-  (`SUPER_SECRET_KEY_32_CHAR_MINIMUM_123456`). Anyone who can see the repo can
-  forge tokens with it — always override
-  `Jwt:Key` via environment/user-secrets in any non-local deployment.
-- Seeded admin uses `admin / 1234`; force a change immediately after first
-  login.
-- CORS allows only the Vite dev origin and Swagger is Development-only —
-  both must be revisited for production hosting.
-- Gmail address of a contributor appears in `appsettings.json` default
-  config; remove if it should not be public.
+  is visible in git history** (commit `0e9a327`; the working tree only ever
+  holds a placeholder). The mailbox password must be rotated by its owner —
+  treat it as compromised. Erasing history (force-push) is a separate,
+  destructive decision and was not taken.
+- The former committed JWT key (`SUPER_SECRET_KEY_32_CHAR_MINIMUM_123456`)
+  remains in history; tokens signed with it must not be trusted and any real
+  deployment needs a fresh `Jwt__Key` (startup now hard-fails in Production
+  without one).
+- `appsettings.json` no longer contains a contributor's personal Gmail
+  address; SMTP identity comes from `EmailSettings__Username`.
+- CORS origins are configurable (`Cors:AllowedOrigins`) with a dev-only
+  default; Swagger is Development-only. `admin/1234` exists only in the
+  Development seeding path (see configuration table above).
+- `EmailService` logs full message bodies only in MOCK mode (placeholder
+  credentials); real SMTP failures log the exception, never the password.
 
 ## Testing, CI, quality
 
-No automated tests exist for either side, and there is no CI. The API build
-was not re-run in this audit environment (no .NET 8 SDK installed);
-frontend `vite build` result is recorded in the audit reports. Manual QA
-evidence lives in `manual_assets/` and `admin_manual.md`.
+No automated tests exist for either side, and there is no CI. `dotnet build`
+and `vite build` runs are recorded in the audit reports
+(`VALIDATION_RESULTS.md` in the handoff). Manual QA evidence lives in
+`manual_assets/` and `admin_manual.md`.
 
 ## Maintenance issues worth knowing
 
-- Root-level utility scripts (`extract_books_v2.py`, `generate_docx.py`,
-  `take_*_screenshots.py`, …) are one-off migrations/tools referencing the
-  dev DB password `1234`; they are not part of the runtime.
+- Root-level utility scripts (`check_fk.py`, `rebuild_db.py`,
+  `sync_all_data.py`, `update_*.py`, `take_*_screenshots.py`, …) are one-off
+  migration/demo tools, not runtime code. DB-touching scripts now require
+  `PGPASSWORD` (or `BOOKSTORE_DB_PASSWORD`) via `pg_env.py`; they no longer
+  embed the dev password.
 - `admin_manual.md` mentions 2FA; the implementation is an e-mail code for
   password change, not an OTP login factor.
 - The backup script keeps its config as empty placeholders — fill the top of

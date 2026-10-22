@@ -3,6 +3,7 @@ import time
 import os
 import sys
 import psycopg2
+from pg_env import db_password, admin_ui_password
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -39,7 +40,7 @@ def clean_database_for_user():
         "host": "localhost",
         "database": "kitapsatisdb",
         "user": "postgres",
-        "password": "1234",
+        "password": db_password(),
         "port": "5432"
     }
     try:
@@ -140,7 +141,7 @@ def main():
         print_flush("Typing login details...")
         set_react_input(driver, username_input, "a@a")
         password_input = driver.find_element(By.XPATH, "//input[@placeholder='Şifre']")
-        set_react_input(driver, password_input, "1234")
+        set_react_input(driver, password_input, admin_ui_password())
         
         time.sleep(1.5)
         driver.save_screenshot("manual_assets/01_login.png")
