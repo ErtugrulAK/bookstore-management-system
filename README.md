@@ -50,8 +50,8 @@ Prereqs: .NET 8 SDK, Node 20+, PostgreSQL 15+, (optional) Gmail app password
 for SMTP.
 
 ```bash
-# 1. Database: create role/db, defaults expect postgres/1234 @ localhost:5432/kitapsatisdb
-#    (override without editing appsettings via env var:)
+# 1. Database: create role/db; appsettings ships an EMPTY password by design.
+#    Point the app at your local db via env var (never commit it):
 #    $env:ConnectionStrings__DefaultConnection = "Host=...;Database=...;Username=...;Password=..."
 
 # 2. API
