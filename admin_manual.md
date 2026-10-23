@@ -39,7 +39,7 @@ Yönetim paneline erişebilmek için yetkili bir yönetici (Admin) hesabı ile s
 ## 2. GENEL BAKIŞ (DASHBOARD) PANELİ
 Yönetim paneline giriş yaptığınızda sizi karşılayan ilk ekrandır. Bu ekran, mağazanın genel durumunu anlık olarak analiz etmenizi sağlar.
 
-![Dashboard Paneli](file:///c:/Users/senmu/Masa%C3%BCst%C3%BC/PROJE/BOOKSTORE/manual_assets/dashboard_mockup.png)
+![Dashboard Paneli](manual_assets/dashboard_mockup.png)
 
 ### Göstergeler ve Kartlar:
 *   **💰 Toplam Gelir**: Tamamlanmış (kargolanan veya elden teslim edilen) siparişlerden elde edilen toplam ciroyu gösterir. Sağ üstündeki grafik simgesi (📈/📉), bir önceki aya göre gelirdeki yüzdelik değişimi ifade eder.
@@ -59,7 +59,7 @@ Yönetim paneline giriş yaptığınızda sizi karşılayan ilk ekrandır. Bu ek
 ## 3. KİTAP YÖNETİMİ (ENVANTER)
 Sistemdeki kitapların eklenmesi, stok takibi, fiyatlandırılması ve listelenmesi işlemleri bu sekmeden yapılır.
 
-![Kitap Yönetimi](file:///c:/Users/senmu/Masa%C3%BCst%C3%BC/PROJE/BOOKSTORE/manual_assets/books_mockup.png)
+![Kitap Yönetimi](manual_assets/books_mockup.png)
 
 ### Yeni Kitap Ekleme:
 1. Kitap listesi ekranının sağ üst köşesindeki **+ Yeni Kitap Ekle** butonuna tıklayın.
@@ -97,7 +97,7 @@ Sistemdeki kitapların eklenmesi, stok takibi, fiyatlandırılması ve listelenm
 ## 4. SİPARİŞ YÖNETİMİ
 Müşterilerin oluşturduğu siparişlerin hazırlandığı, kargolandığı veya elden teslim edildiği kontrol merkezidir.
 
-![Sipariş Yönetimi](file:///c:/Users/senmu/Masa%C3%BCst%C3%BC/PROJE/BOOKSTORE/manual_assets/orders_mockup.png)
+![Sipariş Yönetimi](manual_assets/orders_mockup.png)
 
 ### Elden Teslimat Doğrulama (Barkod/Kod Doğrulama):
 Öğrenciler veya alıcılar siparişlerini kargo yerine dekanlıktan/şahsen teslim almayı seçebilirler. Bu durumda kullanıcılara **DK-FXXXXX** formatında benzersiz bir "Teslimat Kodu" tanımlanır.
@@ -170,7 +170,7 @@ Siber güvenlik önlemleri gereği şifrenizi değiştirmek için iki aşamalı 
 ## 8. DETAYLI RAPORLAMA VE DIŞA AKTARMA
 Finansal denetimler, satış analizleri ve yönetim kurulu sunumları için gelişmiş filtreleme ve raporlama ekranıdır.
 
-![Raporlama Ekranı](file:///c:/Users/senmu/Masa%C3%BCst%C3%BC/PROJE/BOOKSTORE/manual_assets/reports_mockup.png)
+![Raporlama Ekranı](manual_assets/reports_mockup.png)
 
 ### Gelişmiş Filtreleme Seçenekleri:
 *   **Tarih Aralığı**: Başlangıç ve Bitiş tarihlerini seçerek belirli dönemlerin satışlarını filtreleyin.
