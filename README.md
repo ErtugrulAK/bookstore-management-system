@@ -16,6 +16,8 @@ this repo is primarily Turkish — this README is the English index.
 | Storefront | Admin — inventory | Admin — dashboard |
 |---|---|---|
 | ![Storefront](manual_assets/02_home.png) | ![Inventory](manual_assets/books_mockup.png) | ![Dashboard](manual_assets/dashboard_mockup.png) |
+| Admin — orders | Admin — reports | Customer checkout |
+|![Orders](manual_assets/orders_mockup.png) |![Reports](manual_assets/reports_mockup.png) |![Checkout](manual_assets/04_cart_step2.png) |
 
 More flows (checkout steps, distance-sale form, contact, reports) in
 `manual_assets/`, referenced by the admin manual below.
