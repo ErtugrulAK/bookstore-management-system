@@ -3,6 +3,7 @@ import psycopg2
 import math
 import json
 import os
+from pg_env import db_password
 
 def clean_value(val):
     if pd.isna(val) or val is None:
@@ -33,7 +34,7 @@ db_config = {
     "host": "localhost",
     "database": "kitapsatisdb",
     "user": "postgres",
-    "password": "1234",
+    "password": db_password(),
     "port": "5432"
 }
 

@@ -1,6 +1,7 @@
 import psycopg2
 import os
 import re
+from pg_env import db_password
 
 def normalize(text):
     if not text: return ""
@@ -14,8 +15,7 @@ def normalize(text):
     return re.sub(r'[^a-z0-9]', '', text)
 
 def update_images():
-    conn_str = "host=localhost port=5432 dbname=kitapsatisdb user=postgres password=1234"
-    img_dir = r"c:\Users\senmu\Masaüstü\PROJE\BOOKSTORE\BookStore.Web\public\images\books"
+    conn_str = f"host=localhost port=5432 dbname=kitapsatisdb user=postgres password={db_password()}"
     
     manual_matches = {
         "bilgisayarprogramlama": "bilisayarprogramlamamatlabuygulamali",

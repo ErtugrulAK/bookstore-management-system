@@ -2,6 +2,7 @@ import pandas as pd
 import psycopg2
 import json
 import os
+from pg_env import db_password
 
 # 1. Read Excel
 excel_path = 'Kitap Bilgileri.xlsx'
@@ -27,7 +28,7 @@ db_config = {
     "host": "localhost",
     "database": "kitapsatisdb",
     "user": "postgres",
-    "password": "1234",
+    "password": db_password(),
     "port": "5432"
 }
 

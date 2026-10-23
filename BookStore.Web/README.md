@@ -1,16 +1,34 @@
-# React + Vite
+# BookStore.Web — storefront + admin panel (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend of the DEÜ Kitap Satış platform. See the
+[repository README](../README.md) for the full architecture, setup and
+security notes. This directory only covers the client.
 
-Currently, two official plugins are available:
+## Develop
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install
+npm run dev     # http://localhost:5173
+```
 
-## React Compiler
+The dev server proxies `/api/*` to `http://localhost:5229`
+(`vite.config.js`), which is the `dotnet run` HTTP profile of
+`BookStore.Api` — start the API first or every request 502s.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Build
 
-## Expanding the ESLint configuration
+```bash
+npm run build   # output: dist/ (deployed by IIS/nginx as static files)
+npm run preview
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Structure
+
+- `src/pages/` — storefront (home via `App.jsx`, book detail, cart/checkout,
+  distance-sales form, contact, login/register, profile with orders,
+  addresses, favorites) and `Admin/` (dashboard, book & order & user
+  management, contact messages, settings, reports).
+- `src/components/` — navbar, sidebar, footer, book cards, modals.
+- `public/images/books/` — locally served catalog cover images (~45 MB of
+  JPEGs committed on purpose so the catalog renders offline).
+- `src/data/turkeyCities.js` — city list for address/shipping forms.
